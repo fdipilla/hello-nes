@@ -53,106 +53,30 @@ load_palettes_loop:
 	CPX #$20
 	BNE load_palettes_loop  ;if x = $20, 32 bytes copied, all done
 
-	;;
-	;; print hello one sprite at a time
-	;;
 
-	LDA #$50
-	STA $0200  ; Load Y axis
-	LDA #$11
-	STA $0201  ; load tile number 17 in hex (H letter)
+	LDX #$00
+	LDY #$00
+print_hello_world_loop:
+	;; load the Y axis from the data bytes
+	LDA txt_string_y_axis, x
+	STA $0200, y
+	INY
+	;; load a letter from the text string data bytes
+	LDA txt_string, x
+	STA $0200, y
+	INY
+	;; color = 0, no flipping
 	LDA #$00
-	STA $0202  ; color = 0, no flipping
-	LDA #$40
-	STA $0203  ; Load X axis
-
-	LDA #$50
-	STA $0204  ; Load Y axis
-	LDA #$0E
-	STA $0205  ; load tile number 14 in hex (E letter)
-	LDA #$00
-	STA $0206  ; color = 0, no flipping
-	LDA #$4A
-	STA $0207  ; Load X axis
-
-	LDA #$50
-	STA $0208  ; Load Y axis
-	LDA #$15
-	STA $0209  ; load tile number 21 in hex (L letter)
-	LDA #$00
-	STA $020A  ; color = 0, no flipping
-	LDA #$54
-	STA $020B  ; Load X axis
-
-	LDA #$50
-	STA $020C  ; Load Y axis
-	LDA #$15
-	STA $020D  ; load tile number 21 in hex (L letter)
-	LDA #$00
-	STA $020E  ; color = 0, no flipping
-	LDA #$5E
-	STA $020F  ; Load X axis
-
-	LDA #$50
-	STA $0210  ; Load Y axis
-	LDA #$18
-	STA $0211  ; load tile number 24 in hex (O letter)
-	LDA #$00
-	STA $0212  ; color = 0, no flipping
-	LDA #$68
-	STA $0213  ; Load X axis
-
-	;;
-	;; print world one sprite at a time
-	;;
-
-	LDA #$5F
-	STA $0214  ; Load Y axis
-	LDA #$20
-	STA $0215  ; load tile number 32 in hex (W letter)
-	LDA #$00
-	STA $0216  ; color = 0, no flipping
-	LDA #$40
-	STA $0217  ; Load X axis
-
-	LDA #$5F
-	STA $0218  ; Load Y axis
-	LDA #$18
-	STA $0219  ; load tile number 24 in hex (O letter)
-	LDA #$00
-	STA $021A  ; color = 0, no flipping
-	LDA #$4A
-	STA $021B  ; Load X axis
-
-	LDA #$5F
-	STA $021C  ; Load Y axis
-	LDA #$1B
-	STA $021D  ; load tile number 27 in hex (R letter)
-	LDA #$00
-	STA $021E  ; color = 0, no flipping
-	LDA #$54
-	STA $021F  ; Load X axis
-
-
-	LDA #$5F
-	STA $0220  ; Load Y axis
-	LDA #$15
-	STA $0221  ; load tile number 21 in hex (L letter)
-	LDA #$00
-	STA $0222  ; color = 0, no flipping
-	LDA #$5E
-	STA $0223  ; Load X axis
-
-
-	LDA #$5F
-	STA $0224  ; Load Y axis
-	LDA #$0D
-	STA $0225  ; load tile number 13 in hex (D letter)
-	LDA #$00
-	STA $0226  ; color = 0, no flipping
-	LDA #$68
-	STA $0227  ; Load X axis
-
+	STA $0200, y
+	INY
+	;; load the X axis from the data bytes
+	LDA txt_string_x_axis, x
+	STA $0200, y
+	INY
+	;; increment the loop counter
+	INX
+	CPX #$0A
+	BNE print_hello_world_loop  ;if x = $0A, we copied 10 bytes (10 letters from the 'hello world')
 
 	LDA #%10000000   ; enable NMI, sprites from Pattern Table 0
 	STA $2000
@@ -169,9 +93,20 @@ NMI:
 
 	.bank 1
 	.org $E000
+
 palette:
 	.db $0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F
 	.db $0F,$30,$0F,$0B,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F
+
+txt_string:
+	.db $11,$0E,$15,$15,$18
+	.db $20,$18,$1B,$15,$0D
+txt_string_x_axis:
+	.db $40,$4A,$54,$5E,$68
+	.db $40,$4A,$54,$5E,$68
+txt_string_y_axis:
+	.db $50,$50,$50,$50,$50
+	.db $5F,$5F,$5F,$5F,$5F
 
 	.org $FFFA		; set the 3 interrupts
 	.dw NMI
